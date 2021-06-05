@@ -14,12 +14,24 @@ body {
     display: flex;
     justify-content: space-between;
     padding: 38px;
+    background-color: #3f3f3f;
 }
 
 .left-side {
     display: flex;
 }
 
+.brand a {
+    color: #dcdcdc;
+    text-decoration: none;
+    transition: color 0.5s;
+}
+
+.brand a:hover {
+    color: #f5f5f5;
+}
+
+/* Navbar Links */
 .nav-wrapper > .left-side > div{
     margin-right: 20px;
     font-size: 0.9em;
@@ -33,28 +45,70 @@ body {
 }
 
 .nav-link-wrapper a {
-    color: #8a8a8a;
+    color: #dcdcdc;
     text-decoration: none;
     transition: color 0.5s;
 }
 
 .nav-link-wrapper:hover {
-    border-bottom: 1px solid black;
+    border-bottom: 1px solid #8c8c8c;
 }
 
 .nav-link-wrapper a:hover {
-    color: black;
+    color: #f5f5f5;
 }
 
 .active-nav-link {
-    border-bottom: 1px solid black;
+    border-bottom: 1px solid #8c8c8c;
 }
 
 .active-nav-link a {
-    color: black !important;
+    color: #f5f5f5 !important;
+}
+
+/* Dropdown Links */
+.dropdown {
+    float: left;
+    overflow: hidden;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.dropdown-content a {
+    float: none;
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    text-align: left;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown-content a:hover {
+    color: #a39274;
 }
 
 /* Portfolio styles*/
+.content-wrapper {
+    background-color: #dcdcdc;
+}
+
+.content-wrapper h1 {
+    padding: 36px;
+    padding-bottom: 0px;
+    padding-top: 10px;
+    color: #a39274;
+}
 
 .portfolio-items-wrapper {
     display: grid;
@@ -66,14 +120,14 @@ body {
 }
 
 .portfolio-img-background {
-    height: 350px;
+    height: 300px;
     width: 100%;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
 }
 
-.img-text-wrapper {
+.img-text-wrapper a {
     position: absolute;
     top: 0;
     color: transparent;
@@ -87,13 +141,13 @@ body {
     text-align: center;
 }
 
-.img-text-wrapper:hover .subtitle {
+.img-text-wrapper:hover a {
     transition: 1s;
     font-weight: 600;
     color: transparent;
 }
 
-.img-text-wrapper:hover .subtitle {
+.img-text-wrapper:hover a {
     font-weight: 600;
     color: lightseagreen;
 }
@@ -116,8 +170,4 @@ body {
 
 .profile-content-wrapper {
     padding: 30px;
-}
-
-.profile-content-wrapper h1 {
-    color: lightseagreen;
 }
