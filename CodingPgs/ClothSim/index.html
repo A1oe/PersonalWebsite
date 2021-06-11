@@ -1,0 +1,211 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>
+  body {
+    padding: 100px;
+    width: 1000px;
+    margin: auto;
+    text-align: left;
+    font-weight: 300;
+    font-family: 'Open Sans', sans-serif;
+    color: #121212;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Source Sans Pro', sans-serif;
+  }
+</style>
+<title>CS 184 Mesh Editor</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+</head>
+
+
+<body>
+
+<h1 align="middle">CS 184: Computer Graphics and Imaging, Spring 2021</h1>
+<h1 align="middle">Project 4: Cloth Simulator</h1>
+<h2 align="middle">Alyssa Lo, CS184</h2>
+
+<br><br>
+
+<div>
+
+<h2 align="middle">Overview</h2>
+<p>
+    I created a cloth simulator using springs. I also added collisions with other objects
+    and itself by bumping the positions of the point masses (used to simulate cloth)
+    such that the cloth won't clip into the objects as it falls. In addition, I added self collisions,
+    so that the cloth won't clip into itself as it crumples.
+</p>
+
+<p>
+    In this writeup, I show how different variables affect the properties of the cloth and its collisions.
+</p>
+
+
+<h2 align="middle">Part I: Masses and springs</h2>
+    <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/Pt1All.PNG" width="480px" />
+                    <figcaption align="middle">All Spring Types Present</figcaption>
+                    <td align="middle">
+                    <img src="images/Pt1NoShear.PNG" width="480px" />
+                    <figcaption align="middle">Only Strutural and Bending Springs Present</figcaption>
+                </tr>
+                <tr>
+                    <td align="middle">
+                    <img src="images/Pt1OnlyShear.PNG" width="480px" />
+                    <figcaption align="middle">Only Shearing Spring Present</figcaption>
+                </tr>
+            </table>
+        </div>
+
+<h2 align="middle">Part II: Simulation via numerical integration</h2>
+    <div align="center">
+        <table style="width=100%">
+            <tr>
+                <td align="middle">
+                    <img src="images/P2.PNG" width="480px" />
+                    <figcaption align="middle">Default Settings</figcaption>
+                </td></tr>
+        </table>
+    </div>
+
+    <div align="center">
+        <p>
+        The density changed the wrinkley the cloth became (higher = more wrinkley).
+    </p>
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/P2denHi.PNG" width="480px" />
+                    <figcaption align="middle">High Density</figcaption>
+                    <td align="middle">
+                    <img src="images/P2denLo.PNG" width="480px" />
+                    <figcaption align="middle">Low Density</figcaption>
+                </tr>
+                </table>
+        </div>
+    <p>
+        The ks changed how stiff the cloth became (higher = becomes very wiggley).
+    </p>
+                <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/P2ksHi.PNG" width="480px" />
+                    <figcaption align="middle">High ks</figcaption>
+                    <td align="middle">
+                    <img src="images/P2ksLow.PNG" width="480px" />
+                    <figcaption align="middle">Low ks</figcaption>
+                </tr>
+                </table>
+        </div>
+    <p>
+        The dampling changed how quickly the cloth became still (higher = becomes still almost immediately as the cloth falls).
+    </p>
+                <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/P2damHi.PNG" width="480px" />
+                    <figcaption align="middle">High Damping</figcaption>
+                    <td align="middle">
+                    <img src="images/P2damLo.PNG" width="480px" />
+                    <figcaption align="middle">Low Damping</figcaption>
+                </tr>
+            </table>
+        </div>
+<h2 align="middle">Part III: Handling collisions with other objects</h2>  
+    <div align="center">
+        <table style="width=100%">
+            <tr>
+                <td align="middle">
+                <img src="images/P3ks500.PNG" width="480px" />
+                <figcaption align="middle">ks = 500</figcaption>
+                <td align="middle">
+                <img src="images/P3ks5000.PNG" width="480px" />
+                <figcaption align="middle">ks = 5000</figcaption>             
+            </tr>
+            <tr>
+                <td align="middle">
+                <img src="images/P3ks50000.PNG" width="480px" />
+                <figcaption align="middle">ks = 50000</figcaption>
+            </tr>
+        </table>
+    </div>
+    <p>
+        We can see that the higher the ks, the more stiffly the cloth seems to drape over the sphere,
+        especially around the areas of the sphere where the cloth is supposed to be hanging
+        over, rather than resting on top of.
+    </p>
+    <div align="center">
+        <table style="width=100%">
+            <tr>
+                <td align="middle">
+                <img src="images/P3Plane.PNG" width="480px" />
+                <figcaption align="middle">Plane and Cloth Collision.</figcaption>
+            </tr>
+        </table>
+    </div>
+    <p>
+        I followed this youtube video to calculate the projection of a point onto a plane:
+    </p>
+    <p>
+        https://www.youtube.com/watch?v=r5VCChxnLnQ
+    </p>
+
+<h2 align="middle">Part IV: Handling self-collisions</h2> 
+<div align="center">
+        <table style="width=100%">
+            <tr>
+                <td align="middle">
+                <img src="images/P4_1.PNG" width="480px" />
+                <td align="middle">
+                <img src="images/P4_2.PNG" width="480px" />           
+            </tr>
+            <tr>
+                <td align="middle">
+                <img src="images/P4_3.PNG" width="480px" />
+                <td align="middle">
+                <img src="images/P4_4.PNG" width="480px" />
+            </tr>
+        </table>
+    </div>
+    <p>
+        I added self collisions, which hash function created based on this stack overflow post:
+    </p>
+    <p>
+        https://stackoverflow.com/questions/25649342/hash-function-for-3d-integer-coordinates
+    </p>
+<div align="center">
+        <table style="width=100%">
+            <tr>
+                <td align="middle">
+                <img src="images/P4_ks5000000d500.PNG" width="480px" />
+                <figcaption align="middle">ks = 5000000, density = 500</figcaption>
+                <td align="middle">
+                <img src="images/P4_ks50d5.PNG" width="480px" /> 
+                <figcaption align="middle">ks = 50, density = 5</figcaption>
+            </tr>
+        </table>
+    </div>
+    <p>
+        Varying density and ks makes the cloth feel more stiff as they increase
+        and easier to wrinkle, or more flexible as they decrease. We can see that 
+        the self collisions when the ks and density are high seem to show collisions
+        even when the cloth is far away from itself. The opposite is true when these
+        values are small.
+    </p>
+
+    <h2 align="middle">Part V: Shaders</h2>
+    <h3 align="middle">Diffuse Shading</h3>
+    <h3 align="middle">Blinn-Phong Shading</h3>
+    <h3 align="middle">Texture Mapping</h3>
+    <h3 align="middle">Bump & Displacement Map</h3>
+    <h3 align="middle">Mirror Shading</h3>
+</body>
+</html>

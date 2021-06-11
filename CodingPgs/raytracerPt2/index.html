@@ -1,0 +1,158 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>  
+    div.padded {  
+      padding-top: 0px;  
+      padding-right: 100px;  
+      padding-bottom: 0.25in;  
+      padding-left: 100px;  
+    }  
+  </style> 
+<title>Alyssa Lo  |  CS 184</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+</head>
+<body>
+<br />
+<h1 align="middle">Assignment 3: PathTracer</h1>
+    <h2 align="middle">Alyssa Lo</h2>
+
+    <div class="padded">
+        <p>In this assignment, I added 2 new features to the pathtracing project: Microfacet Model (allows for glossy surfaces)
+        and Depth of Field via Focal Depth and Aperture. The Microfacet Model was implemented through NDF (Normal Distribution
+        Function), Fresnel Term, as well as using importance sampling. The Depth of Field was implemented through simulating a thin lens 
+        by generating 2 rays that simulate a ray that has refracted.</p>
+
+    <h2 align="middle">Part 2: Microfacet Model</h2>
+    <p>We can see below that as the alpha decreases, the metallic quality of the dragon's material increases. At the smallest
+            alpha, the dragon is almost completely matte yellow. However, as the alpha increases, the dragon's coloring includes 
+            its surroundings (blue, black, red) as well.</p>
+
+    <p> Settings: -t 8 -s 128 -l 1 -m 5 -r 480 360 </p>
+
+        <p> Note: Little white specs, also known as fireflies, occur because a 
+            super specular surface (as with higher alphas) in a ray's path cause radiance to increase. </p>
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/CBdragonMicrofacet0.5.png" width="480px" />
+                    <figcaption align="middle">α = 0.5</figcaption>
+                    <td align="middle">
+                    <img src="images/CBdragonMicrofacet0.25.png" width="480px" />
+                    <figcaption align="middle">α = 0.25</figcaption>
+                </tr>
+                <tr>
+                    <td align="middle">
+                    <img src="images/CBdragonMicrofacet0.05.png" width="480px" />
+                    <figcaption align="middle">α = 0.05</figcaption>
+                    <td align="middle">
+                    <img src="images/CBdragonMicrofacet0.005.png" width="480px" />
+                    <figcaption align="middle">α = 0.005</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <p> Below, we can see images of CBbunny rendered with the implemented importance sampling and the given cosine
+            hemisphere sampling. We can see a black outline around the cosine hemisphere sampling
+            bunny, as well as more noise on the image. The reason is because the importance sampling 
+            converges faster than the ccosine hemisphere sampling. The cosine hemisphere sampling bunny needs a different alpha.</p>
+
+        <p> Settings: -t 8 -s 64 -l 1 -m 5 -r 480 360 and α = 0.05 </p>
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/CBbunny_microfacet_Importance.png" width="480px" />
+                    <figcaption align="middle">CBbunny rendered with importance sampling</figcaption>
+                
+                    <td align="middle">
+                    <img src="images/CBbunny_microfacet_Hemi.png" width="480px" />
+                    <figcaption align="middle">CBbunny rendered with cosine hemisphere sampling</figcaption>
+                </tr>
+            </table>
+        </div>
+
+        <p> Below is an example of alternative eta and k values. I used the optical constants of Bi (Bismuth)</p>
+
+        <td align="middle">
+        <img src="images/CBdragon_bi.png" width="480px" />
+        <figcaption align="middle">A Bismuth CBdragon</figcaption>
+
+     <h2 align="middle">Part 4: Depth of Field</h2>
+    <p>
+        The difference between a pinhole camera and a thin-lens camera model is that the pinhole camera is the ideal camera,
+        able to focus on everything in the image. On the other hand, the thin-lens camera is more similar an eye in that
+        it focuses on one area of the image. 
+    </p>
+
+     <p> Settings: -t 8 -s 256 -l 4 -m 5 -r 480 360 </p>
+
+     <h3>Aperture</h3>
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/CBbun_b001_d1.png" width="480px" />
+                    <figcaption align="middle">aperture = 0.01 and focal depth = 1</figcaption>
+                
+                    <td align="middle">
+                    <img src="images/CBbun_b005_d1.png" width="480px" />
+                    <figcaption align="middle">aperture = 0.05 and focal depth = 1</figcaption>
+                </tr>
+                <tr>
+                    <td align="middle">
+                    <img src="images/CBbun_b01_d1.png" width="480px" />
+                    <figcaption align="middle">aperture = 0.1 and focal depth = 1</figcaption>
+                
+                    <td align="middle">
+                    <img src="images/CBbun_b05_d1.png" width="480px" />
+                    <figcaption align="middle">aperture = 0.5 and focal depth = 1</figcaption>
+                </tr>
+            </table>
+        </div>
+    <h3>Focal Depth</h3>
+        <p> Note: I was unable to get the program to build locally, 
+            so all the images in this report were rendered in the hive machines.
+            Therefore the pictures for focal depth are harder to understand what is going on.</p>
+
+        <p> Changing the focal depth is supposed to allow the camera to focus on specific parts of an image. However,
+            it's hard to see here because I was unable to move the camera closer to the bunny, to capture the changes in
+            focus when focusing on the head vs tail.</p>
+
+        <p> Changing the focal depth is supposed to allow the camera to focus on specific parts of an image. However,
+            it's hard to see here because I was unable to move the camera closer to the bunny, to capture the changes in
+            focus when focusing on the head vs tail. We are able to see some slight shifts in the little specs of
+            light on and around the bunny, specifically with the bottom light blob on the hind leg of the bunny.</p>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                    <img src="images/CBbun_b005_d05.png" width="480px" />
+                    <figcaption align="middle">aperture = 0.05 and focal depth = 0.5</figcaption>
+                
+                    <td align="middle">
+                    <img src="images/CBbun_b005_d1.png" width="480px" />
+                    <figcaption align="middle">aperture = 0.05 and focal depth = 1</figcaption>
+                </tr>
+                <tr>
+                    <td align="middle">
+                    <img src="images/CBbun_b005_d21.png" width="480px" />
+                    <figcaption align="middle">aperture = 0.05 and focal depth = 2.1</figcaption>
+                
+                    <td align="middle">
+                    <img src="images/CBbun_b005_d3.png" width="480px" />
+                    <figcaption align="middle">aperture = 0.05 and focal depth = 3</figcaption>
+                </tr>
+            </table>
+        </div>
+
+</div>
+</body>
+</html>
+
+
+
+

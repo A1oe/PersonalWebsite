@@ -1,0 +1,291 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+  <style>
+    body {
+      padding: 100px;
+      width: 1000px;
+      margin: auto;
+      text-align: left;
+      font-weight: 300;
+      font-family: 'Open Sans', sans-serif;
+      color: #121212;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+      font-family: 'Source Sans Pro', sans-serif;
+    }
+  </style>
+  <title>CS 184 Mesh Editor</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+</head>
+
+
+<body>
+
+  <h1 align="middle">CS 184: Computer Graphics and Imaging, Spring 2021</h1>
+  <h1 align="middle">Project 2: Mesh Editor</h1>
+  <h2 align="middle">Alyssa Lo, CS184-Spring 2021</h2>
+
+  <br><br>
+
+  <div>
+
+    <h2 align="middle">Overview</h2>
+    <p>
+        This project is a Mesh Editor. In this project, I implemented Bezier curves and surfaces using de Casteljau's algorithm, Phong
+        Shading using vertex normals, and upsampled meshes with loop subdivision. An interesting
+        things I learned from this project is how useful Bezier curves are for computer 
+        graphics. In the project, I used it to create smooth meshes, but they can also 
+        be used for fonts, camera movement, and much more.
+    </p>
+
+    <h2 align="middle">Section I: Bezier Curves and Surfaces</h2>
+
+    <h3 align="middle">Part 1: Bezier curves with 1D de Casteljau subdivision</h3>
+
+    <p>
+        de Castelijau's algorithm is using linear interpolation recursively and choosing many weights to create a curve.
+        Essentially, I linearly interpolate between each contiguous control point.
+        Then, I linearly interpolate between one point on the linearly interpolated
+        line from a pair of control points and another from the contiguous pair of control points.
+        I make sure to choose pairs of points depending on the weight I've chosen.
+        I continue to do this recursively until there are no more pairs of lines created through linear interpolation.
+    </p>
+
+    <p>
+        Below are pictures of each recursive step visualized with these points:
+        0.100 0.050   0.300 0.200   0.400 0.01   0.650 0.800   0.700 0.450  1.000 1.000
+    </p>
+
+    <div align="middle">
+      <table style="width=100%">
+        <tr>
+          <td>
+            <img src="images/part1_step0.PNG" align="middle" width="600px" />
+            <figcaption align="middle">Step 0</figcaption>
+          </td>
+          <td>
+            <img src="images/part1_step2.PNG" align="middle" width="600px" />
+            <figcaption align="middle">Step 1</figcaption>
+          </td>
+        </tr>
+        <br>
+        <tr>
+          <td>
+            <img src="images/part1_step2.PNG" align="middle" width="600px" />
+            <figcaption align="middle">Step 2</figcaption>
+          </td>
+          <td>
+            <img src="images/part1_step3.PNG" align="middle" width="600px" />
+            <figcaption align="middle">Step 3</figcaption>
+          </td>
+        </tr>
+          <br>
+        <tr>
+          <td>
+            <img src="images/part1_step4.PNG" align="middle" width="600px" />
+            <figcaption align="middle">Step 4</figcaption>
+          </td>
+          <td>
+            <img src="images/part1_step5.PNG" align="middle" width="600px" />
+            <figcaption align="middle">Step 5</figcaption>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <div>
+    <img src="images/part1_newcurve.PNG" align="middle" width="600px" />
+    <figcaption align="middle">Bezier curve with custom points and t value</figcaption>
+    </div>
+
+    <h3 align="middle">Part 2: Bezier surfaces with separable 1D de Casteljau subdivision</h3>
+
+    <p>
+        The de Casteljau algorithm can be used to create Bezier surfaces by breaking down the surface
+        into what is essentially Bezier lines that run in a wiggley "grid" pattern. 
+    </p>
+
+    <p>
+        I implemented it by running the de Casteljau algorithm a specified number (u)
+        of times across one axis. This gives me u linearly interpolated lines.
+        Then, I ran it across a specified number (v) of points across the perpendicular axis, 
+        using the final linearly interpolated lines created from the 
+        first iteration of the de Casteljau algorithm.
+    </p>
+
+    <img src="images/part2.PNG" align="middle" width="600px" />
+    <figcaption align="middle">Result of running teapot.bez = A teapot!</figcaption>
+
+    <h2 align="middle">Section II: Sampling</h2>
+
+    <h3 align="middle">Part 3: Average normals for half-edge meshes</h3>
+
+    <p>
+        I implemented the area-weighted vertex normals by traversing through each 
+        face incident to the vertex, calling normal() 
+        (which returns the unit normal of the face) to find the normal, 
+        summing up all the unit normals of the faces, and then finding the unit normal of all
+        the faces.
+    </p>
+
+    <div align="middle">
+      <table style="width=100%">
+        <tr>
+          <td>
+            <img src="images/part3_flat.PNG" align="middle" width="600px" />
+            <figcaption align="middle">Flat shading</figcaption>
+          </td>
+          <td>
+            <img src="images/part3_phong.PNG" align="middle" width="600px" />
+            <figcaption align="middle">Phong shading</figcaption>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <h3 align="middle">Part 4: Half-edge flip</h3>
+
+    <p>
+        I implemented the edge flip operation by listing out 
+        every vertex, edge, half edge, and face. Then, I reset the neighbors 
+        of each half edge such that they would have their new parameters. Then,
+        I updated the appropriate half edge of each vertex, edge, and face.
+    </p>
+
+    <img src="images/part4.PNG" align="middle" width="600px" />
+    <figcaption align="middle">A couple of edge flips!</figcaption>
+
+    <p>
+        I formatted the code by triangle and type of object(vertex, edge, etc.).
+        Additionally, I drew out on a sheet of paper how the edge would be 
+        transformed and labeled every object to provide myself with a good visual of
+        what to update.
+    </p>
+
+    <h3 align="middle">Part 5: Half-edge split</h3>
+
+    <img src="images/drawing.png" align="middle" width="600px" />
+    <figcaption align="middle">My drawings for Part 4 and 5</figcaption>
+
+    <p>
+        I created new half edges, edges, faces, and 1 new vertex to accomadate for the
+        split. I then went and updated all the existing and new objects such that 
+        their half edges would be correct, and the neighbors were correct. 
+    </p>
+
+      <div align="middle">
+      <table style="width=100%">
+        <tr>
+          <td>
+            <img src="images/Part5_edgebefore.PNG" align="middle" width="600px" />
+            <figcaption align="middle">Mesh before any changes</figcaption>
+          </td>
+          <td>
+            <img src="images/Part5_edgeafter.PNG" align="middle" width="600px" />
+            <figcaption align="middle">Mesh after splits</figcaption>
+          </td>
+        </tr>
+        <br>
+        <tr>
+          <td>
+            <img src="images/Part5_edgesplitafter.PNG" align="middle" width="600px" />
+            <figcaption align="middle">Mesh after splits and flips</figcaption>
+          </td>
+        </tr>
+        <br>
+      </table>
+    </div>
+
+    <h3 align="middle">Part 6: Loop subdivision for mesh upsampling</h3>
+    <p>
+        I implemented loop subdivision by first finding the vertex positions based on the loop subdivision
+        rule as well as from spitting the edges. Then I split every edge and flip the ones that are touching both an 
+        old and new vertex.
+    </p>
+
+    <p>
+        I found the new vertex positions by calculating: 
+        (1 - n * u) * original_position + u * original_neighbor_position_sum, 
+        where n = number of vertexes surrounding the vertex and u = 3/16 if n = 3 and 3/(8n) otherwise.
+    </p>
+
+    <p>
+        As for the vertex positions from splitting edges, I found them through this equation:
+
+        3/8 * (A + B) + 1/8 * (C + D). A, B, C, D are vertices on the triangles and A and B are shared 
+        by both triangles. 
+    </p>
+
+    <div align="middle">
+      <table style="width=100%">
+        <tr>
+          <td>
+            <img src="images/Part6_Bean1.PNG" align="middle" width="600px" />
+            <figcaption align="middle">The Bean - no loop subdivisions</figcaption>
+          </td>
+
+          <td>
+              <img src="images/Part6_Bean2.PNG" align="middle" width="600px" />
+              <figcaption align="middle">The Bean - 2 loop subdivisions</figcaption>
+          </td>
+        </tr>
+        <td>
+            <img src="images/Part6_Bean3.PNG" align="middle" width="600px" />
+            <figcaption align="middle">The Bean - 4 loop subdivisions</figcaption>
+        </td>
+      </br>
+     </table>
+    </div>
+
+    <p>
+        After loop subdivision, the models look smoother and more uniform all around. All the sharp 
+        corners and edges become smooth. If I pre-split some edges, I can pre-form some edges. 
+        However, it's clear that the computer is struggling to render the model as we add more subdivisions.
+        The FPS drops quickly. In addition, the model created with 4 loop subdivisions doesn't look
+        noticably smoother or better than the one with 2 loop subdivisions. In fact, it looks arguably worse,
+        since the triangle outlines have created a lot of noise on the model.
+    </p>
+
+    <div align="middle">
+      <table style="width=100%">
+        <tr>
+          <td>
+            <img src="images/Part6_Cube1.PNG" align="middle" width="600px" />
+            <figcaption align="middle">Cube - no loop subdivisions</figcaption>
+          </td>
+
+          <td>
+              <img src="images/Part6_Cube2.PNG?" align="middle" width="600px" />
+              <figcaption align="middle">Cube - 1 loop subdivisions</figcaption>
+          </td>
+        </tr>
+        <td>
+            <img src="images/Part6_Cube4.PNG" align="middle" width="600px" />
+            <figcaption align="middle">Cube - 4 loop subdivisions</figcaption>
+        </td>
+      </br>
+     </table>
+    </div>
+
+    <p>
+        We can see in the above pictures that as we subdivide the cube, it gets lumpy and asymmetric.
+        In order to subdivide the cube symmetrically, I would need to pre-split the edges near 
+        the middle of each face. This would cause the square to become more symmetrical, since
+        the corner vertices currently have more edges touching them than the other vertices do.
+    </p>
+
+    <h2 align="middle">Section III: Optional Extra Credit</h2>
+    <p>If you are not participating in the optional mesh competition, don't worry about this section!</p>
+
+    <h3 align="middle">Part 7: Design your own mesh!</h3>
+
+</body>
+
+</html>

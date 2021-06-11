@@ -1,0 +1,456 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>  
+    div.padded {  
+      padding-top: 0px;  
+      padding-right: 100px;  
+      padding-bottom: 0.25in;  
+      padding-left: 100px;  
+    }  
+  </style> 
+<title>Alyssa Lo  |  CS 184</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+</head>
+<body>
+    <br />
+    <h1 align="middle">Assignment 3: PathTracer</h1>
+    <h2 align="middle">Alyssa Lo</h2>
+
+    <div class="padded">
+        <p>
+            In this project, I created a Ray Tracer. First, I started by coding up ray-object intersections,
+            with which I could color in pixels based on samples from the rays. I used the Möller–Trumbore intersection algorithm
+            for the ray-triangle intersections. Then, I implemented BVH, or Bounding Volume Hierarchy. It's
+            a binary tree structure that allows the user to quickly find objects. Afterwards, I moved on to
+            Illumination.
+        </p>
+        <p>
+            There were 2 parts to Illumination: Direct and Global. Direct Illumination
+            can be thought of as the light that hit the objects first (not bouncing). I implemented
+            direct illumination in 2 ways: by sampling lights and by sampling the hemisphere uniformly.
+            Global Illumination can be thought of as scattered light and direct light (both direct and indirect light).
+        </p>
+        <p>
+            To speed up the sampling process, I implemented Adaptive sampling, which uses statistics
+            to stop sampling a pixel early.
+        </p>
+
+        <h2 align="middle">Part 1: Ray Generation and Intersection</h2>
+        <p>
+            For ray generation, I first transformed a point from the image plane to camera space, then to world space.
+            The image plane would be the point on the 2D photo that results from taking a picture using the camera. Camera space
+            would put the point to the location relative to the camera. World space would put the point relative to the origin
+            of the world. Then, I generate a ray from the camera to the point in world space.
+        </p>
+
+        <p>
+            To raytrace, I sample many points in a given pixel to generate rays from the camera for each of them.
+            Using these rays, I take the average illumination of them and update the pixel.
+        </p>
+
+        <p>
+            The triangle intersection algorithm I implemented was the Möller–Trumbore intersection algorithm.
+            The algorithm helps figure out what point a ray intersects with a triangle (if at all)
+            by rewriting the ray formula to a form similar to Barycentric coordinates in that it writes out the
+            intersection point as a weighted sum of the 3 points of the triangle. Below is a picture of the actual
+            equations used.
+        </p>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                        <img src="./images/slide-22.png" width="480px" />
+                        <figcaption align="middle">Source: https://cs184.eecs.berkeley.edu/sp21/lecture/9-22/ray-tracing </figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                        <img src="./images/CBspheres.png" width="480px" />
+                        <figcaption align="middle">A simple scene with 2 balls made with simple ray intersections. </figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                        <img src="./images/CBgems.png" =" width="480px" />
+                        <figcaption align="middle">A simple scene with 3 gems made with simple ray intersections.</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                        <img src="./images/CBcoil.png" width="480px" />
+                        <figcaption align="middle">A simple scene with a coil made with simple ray intersections. This took a considerably long time.</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <h2 align="middle">Part 2: Bounding Volume Hierarchy</h2>
+        <h3>
+            BVH Construction Algorithm:
+        </h3>
+        <p>
+            First, I create the root node's bounding box and expand it to encompass all primitives.
+        </p>
+        <p>
+            If the number of primitives is too large, I create a left and right node for the root node
+            to split the primitives into two. My heuristic for determining which primitive goes in which
+            node is to split in the middle of the all the primitives' centroids. I split on the
+            largest axis. Then I repeat the process recursively on each left and right node until
+            there are no more nodes that are split.
+        </p>
+        <p>
+            Otherwise, the node will be a leaf node. I save iterator pointers to the start
+            and end of the section of the grand list of primitives that correspond to this node.
+        </p>
+        <p>
+            Below are some examples of scenes made possible by BVH.
+        </p>
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                        <img src="./images/bunny.png" width="480px" />
+                        <figcaption align="middle">Bunny</figcaption>
+                    </td>
+                    <td align="middle">
+                        <img src="./images/CBlucy.png" width="480px" />
+                        <figcaption align="middle">CBlucy</figcaption>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="middle">
+                        <img src="./images/maxplanck.png" width="480px" />
+                        <figcaption align="middle">maxplanck</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                        <img src="./images/CBcoilTime.PNG" width="480px" />
+                        <figcaption align="middle">Results when rendering CBcoil before implementing BVH</figcaption>
+                    </td>
+                    <td align="middle">
+                        <img src="./images/CBcoilTimeAfter.PNG" width="480px" />
+                        <figcaption align="middle">Results when rendering CBcoil after implementing BVH</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <p>
+            Here, we can clearly see that with BVH, the CBcoil rendered much, much faster (418.4196s VS 0.2532s).
+            Rendering with rays with Bounding Volume Hierarchy speeds up the process immensely.
+            It's almost instantaneous.
+        </p>
+
+        <h2 align="middle">Part 3: Direct Illumination</h2>
+        <h3>
+            Direct Lighting with Uniform Hemisphere Sampling:
+        </h3>
+        <p>
+            The Direct Lighting with Uniform Hemisphere Sampling works by creating rays at a uniform random from
+            points in the scene num of lights * ns_area_light times. The rays' origins are hit_p + EPS_F * sample,
+            and they point towards the samples I created. Then, for each ray, if it instersects
+            with the Bounding Box of the object, find the emitted light from the object's material at that point.
+            Then, return the average result of all the samples to find the total amount of reflected light.
+        </p>
+
+        <p>
+            Settings: -t 8 -s 64 -l 32 -m 6 -H -f CBbunny_H_64_32.png -r 480 360 ../dae/sky/CBbunny.dae
+        </p>
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                        <img src="./images/CBbunny_H_64_32.png" width="480px" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <h3>
+            Direct Lighting with Importance Sampling of Lights:
+        </h3>
+        <p>
+            The Direct Lighting with Importance Sampling of Lights works by creating rays by sampling
+            the random points on the scene for each light source (delta lights mean I only sample once).
+            Then, I will get the incoming radiance, pdf, and distance from hit point to light. Convert the
+            incoming radiance direction vector into object space. If the cos theta of this direction vector is
+            greater than 0, I know the light isn't behind the object at the hit point. Using the
+            variables I get from before, I create a shadow ray to check if it is intersecting anything.
+            If it isn't, I add it in to calculate the total amount of outgoing light.
+        </p>
+
+        <p>
+            Settings: -t 8 -s 64 -l 32 -m 6 -f bunny_64_32.png -r 480 360 ../dae/sky/bunny.dae
+        </p>
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                        <img src="./images/bunny_64_32.png" width="480px" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <h3>
+            Light sampling:
+        </h3>
+        <p>
+            Settings: -t 8 -s 1 -l 64 -m 1 -f dragon_64.png -r 480 360 ../../../dae/sky/dragon.dae
+        </p>
+        <p>
+            As I increase the number of light rays for light sampling (aka importance sampling of lights),
+            the image of the dragon becomes less noisy. Since the whole dragon seems to be in soft shadow,
+            the whole image becomes more clear.
+        </p>
+
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                        <img src="./images/dragon_1.png" width="480px" />
+                        <figcaption align="middle">1 light ray, 1 sample per pixel</figcaption>
+                    </td>
+                    <td align="middle">
+                        <img src="./images/dragon_4.png" width="480px" />
+                        <figcaption align="middle">4 light rays, 1 sample per pixel</figcaption>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="middle">
+                        <img src="./images/dragon_16.png" width="480px" />
+                        <figcaption align="middle">16 light rays, 1 sample per pixel</figcaption>
+                    </td>
+                    <td align="middle">
+                        <img src="./images/dragon_64.png" width="480px" />
+                        <figcaption align="middle">64 light rays, 1 sample per pixel</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <h2 align="middle">Part 4: Global Illumination</h2>
+        <p>
+            To simulate indirect lighting, I followed each ray and recursed max_ray_depth amount of times
+            on its children. This means that when a ray intersects with something, I create a new ray
+            with parameters from the intersection and follow that ray. First, I find the one bounce radiance
+            of the first ray. Then, at the outgoing light at the intersection, I sample a possible incident
+            light direction. I must have at least one indirect bounce, so using this light direction, I create a new ray where the origin is at
+            EPS_F * w_i + hit_p. If that ray intersects with anything, I recurse and sum the illuminations.
+            Note that if this hadn't been the at least one indirect bounce, I would have determined whether
+            or not to create the ray and calculate the illuminations based on a Russian Roulette coin flip.
+        </p>
+
+        <h3>
+            Global Illumination Scenes (1024 samples per pixel)
+        </h3>
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                        <img src="./images/bench.png" width="480px" />
+                        <figcaption align="middle">bench.png</figcaption>
+                    </td>
+                    <td align="middle">
+                        <img src="./images/spheres.png" width="480px" />
+                        <figcaption align="middle">spheres.png</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <h3>
+            only Direct Illumination VS only Indirect Illumination (1024 samples per pixel)
+        </h3>
+        <p>
+            Settings: -t 8 -s 1024 -l 16 -m 2 -r 480 360 -f dragon(In or)Direct.png ../../../dae/sky/dragon.dae
+        </p>
+        <p>
+            We can see that the direct illumination is significantly brighter than the indirect illumination picture
+            in the lit areas and significantly darker in the shaded areas. This is because as the ray hits
+            textures, it loses brightness by a cosine factor.
+        </p>
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                        <img src="./images/spheresDirect.png" width="480px" />
+                        <figcaption align="middle">Direct Illumination</figcaption>
+                    </td>
+                    <td align="middle">
+                        <img src="./images/spheresIndirect.png" width="480px" />
+                        <figcaption align="middle">Indirect Illumination</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <h3>
+            Max_Ray_Depth Comparisons (1024 samples per pixel)
+        </h3>
+
+        <p>
+            Below are pictures of the bunny rendered at different max_ray_depths.
+            We can clearly see that the logarithmic relationship between the max_ray_depth
+            and the brightness of the scene.
+        </p>
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                        <img src="./images/bunny0.png" width="480px" />
+                        <figcaption align="middle">0 max_ray_depth</figcaption>
+                    </td>
+                    <td align="middle">
+                        <img src="./images/bunny1.png" width="480px" />
+                        <figcaption align="middle">1 max_ray_depth (aka Direct Illumination)</figcaption>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="middle">
+                        <img src="./images/bunny2.png" width="480px" />
+                        <figcaption align="middle">2 max_ray_depth</figcaption>
+                    </td>
+                    <td align="middle">
+                        <img src="./images/bunny3.png" width="480px" />
+                        <figcaption align="middle">3 max_ray_depth</figcaption>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="middle">
+                        <img src="./images/bunny100.png" width="480px" />
+                        <figcaption align="middle">100 max_ray_depth</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <h3>
+            Sample-per-pixel rates Comparisons (4 light rays, 3 max-depth)
+        </h3>
+        <p>
+            The graininess of the picture decreases as the amount of samples per pixel
+            increases.
+        </p>
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                        <img src="./images/wall-e1.png" width="480px" />
+                        <figcaption align="middle">1 sample-per-pixel</figcaption>
+                    </td>
+                    <td align="middle">
+                        <img src="./images/wall-e2.png" width="480px" />
+                        <figcaption align="middle">2 sample-per-pixel</figcaption>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="middle">
+                        <img src="./images/wall-e4.png" width="480px" />
+                        <figcaption align="middle">4 sample-per-pixel</figcaption>
+                    </td>
+                    <td align="middle">
+                        <img src="./images/wall-e8.png" width="480px" />
+                        <figcaption align="middle">8 sample-per-pixel</figcaption>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="middle">
+                        <img src="./images/wall-e16.png" width="480px" />
+                        <figcaption align="middle">16 sample-per-pixel</figcaption>
+                    </td>
+                    <td align="middle">
+                        <img src="./images/wall-e64.png" width="480px" />
+                        <figcaption align="middle">64 sample-per-pixel</figcaption>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="middle">
+                        <img src="./images/wall-e1024.png" width="480px" />
+                        <figcaption align="middle">1024 sample-per-pixel</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <h2 align="middle">Part 5: Adaptive Sampling</h2>
+        <p>
+            Adaptive Sampling help increase the samples per pixel for those that
+            converge faster with more samples and vice versa, rather than having
+            a uniform amount of samples per pixel. The goal of adaptive sampling is
+            to speed up the rendering process.
+        </p>
+        <p>
+            For each sample, if the number of samples is a multiple of the number of samplesPerBatch, I check if the
+            pixel I am sampling from has converged yet. This is calculated by this equation:
+        </p>
+        <p align="middle"><pre align="middle">I <= maxTolerance * μ</pre></p>
+        <p align="middle"><pre align="middle">I = 1.96 * σ / sqrt(n)</pre></p>
+        <p align="middle"><pre align="middle">where I = variable for convergence</pre></p>
+        <p align="middle"><pre align="middle">σ = standard deviation of the samples</pre></p>
+        <p align="middle"><pre align="middle">n = number of samples</pre></p>
+        <p align="middle"><pre align="middle">μ = mean of the samples</pre></p>
+        <p>
+            These samples are the illuminances of the sample rays that are created. I find the
+            values through these equations:
+        </p>
+        <p align="middle"><pre align="middle">s_1 = sum of samples</pre></p>
+        <p align="middle"><pre align="middle">s_2 = sum of squared samples</pre></p>
+        <p align="middle"><pre align="middle">μ = s_1 / n</pre></p>
+        <p align="middle"><pre align="middle">σ^2 = 1/(n-1) * (s_2 - (s_1^2 / n))</pre></p>
+        <p>
+            If I <= maxTolerance * μ, then I immediately stop sampling the pixel because it
+            has already converged enough. Otherwise I create a ray and sample.
+        </p>
+        <p>
+            Bunny Settings: -t 8 -s 2048 -a 64 0.05 -l 1 -m 5 -r 480 360 -f HDbunny.png ../dae/sky/CBbunny.dae
+        </p>
+        <p>
+            Peter Settings: -t 8 -s 2048 -a 23 0.05 -l 1 -m 5 -r 480 360 -f peterTest.png ../../../dae/meshedit/peter.dae
+        </p>
+        <div align="center">
+            <table style="width=100%">
+                <tr>
+                    <td align="middle">
+                        <img src="./images/HDbunny.png" width="480px" />
+                        <figcaption align="middle"> 2048 samples per pixel: Bunny </figcaption>
+                    </td>
+                    <td align="middle">
+                        <img src="./images/HDbunny_rate.png" width="480px" />
+                        <figcaption align="middle">Heat Map of Sampling Rates: Bunny</figcaption>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="middle">
+                        <img src="./images/peterTest.png" width="480px" />
+                        <figcaption align="middle"> 2048 samples per pixel: Peter </figcaption>
+                    </td>
+                    <td align="middle">
+                        <img src="./images/peterTest_rate.png" width="480px" />
+                        <figcaption align="middle">Heat Map of Sampling Rates: Peter</figcaption>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div></body>
+</html>
+
+
+
+

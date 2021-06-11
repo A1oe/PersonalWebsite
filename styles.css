@@ -67,7 +67,7 @@ body {
 }
 
 /* Dropdown Links */
-.dropdown {
+/*.dropdown {
     float: left;
     overflow: hidden;
 }
@@ -96,7 +96,7 @@ body {
 
 .dropdown-content a:hover {
     color: #a39274;
-}
+}*/
 
 /* Portfolio styles*/
 .content-wrapper {
@@ -170,4 +170,38 @@ body {
 
 .profile-content-wrapper {
     padding: 30px;
+}
+
+/* Carousel code */
+.carousel-item {
+    height: 500px;
+    width: 100%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* image fill */
+.fill {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.fill img {
+    flex-shrink: 100;
+    min-width: 100%;
+    min-height: 100%;
+}
+
+.front-image-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.front-image-wrapper img {
+    width: 100%;
 }
