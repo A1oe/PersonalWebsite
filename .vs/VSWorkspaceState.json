@@ -1,8 +1,11 @@
 {
   "ExpandedNodes": [
     "",
+    "\\CodingPgs\\raytracer",
+    "\\docs",
+    "\\files",
     "\\images"
   ],
-  "SelectedNode": "\\docs",
+  "SelectedNode": "\\docs\\index.html",
   "PreviewInSolutionExplorer": false
 }
