@@ -77,5 +77,65 @@
         </nav>
     </div>
 
+    <div id="featured" class="carousel slide" data-ride="carousel">
+
+        <!-- Indicators -->
+        <ul class="carousel-indicators">
+            <li data-target="#featured" data-slide-to="0" class="active"></li>
+            <li data-target="#featured" data-slide-to="1"></li>
+            <li data-target="#featured" data-slide-to="2"></li>
+        </ul>
+
+        <!-- The slideshow -->
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="images/FlowerInCup2.png" alt="HelloSpring">
+
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>hello</h5>
+                    <p>...</p>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img src="images/Frame.png" alt="BillFrame">
+
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>...</h5>
+                    <p>...</p>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img src="images/SelfPortrait.png" alt="SelfPortrait">
+
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>...</h5>
+                    <p>...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Left and right controls -->
+        <a class="carousel-control-prev" href="#featured" data-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+        </a>
+        <a class="carousel-control-next" href="#featured" data-slide="next">
+            <span class="carousel-control-next-icon"></span>
+        </a>
+
+    </div>
 </body>
 </html>
+
+<script>
+    const portfolioItems = document.querySelectorAll('.portfolio-item-wrapper')
+
+    portfolioItems.forEach(portfolioItem => {
+    portfolioItem.addEventListener('mouseover', () => {
+    portfolioItem.childNodes[1].classList.add('img-darken');
+    })
+
+    portfolioItem.addEventListener('mouseout', () => {
+    portfolioItem.childNodes[1].classList.remove('img-darken');
+    })
+    })
+</script>

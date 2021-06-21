@@ -65,38 +65,6 @@ body {
     color: #f5f5f5 !important;
 }
 
-/* Dropdown Links */
-/*.dropdown {
-    float: left;
-    overflow: hidden;
-}
-
-.dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #f9f9f9;
-    min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
-}
-
-.dropdown-content a {
-    float: none;
-    color: black;
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-    text-align: left;
-}
-
-.dropdown:hover .dropdown-content {
-    display: block;
-}
-
-.dropdown-content a:hover {
-    color: #a39274;
-}*/
-
 /* Portfolio styles*/
 .content-wrapper {
     background-color: #dcdcdc;
@@ -419,19 +387,6 @@ body{
     margin-bottom: 0
 }
 
-/*.main-timeline .timeline:nth-child(2n) .date-content {
-    float: right
-}
-
-.main-timeline .timeline:nth-child(2n) .date-content:before {
-    left: 10px
-}
-
-.main-timeline .timeline:nth-child(2n) .timeline-content {
-    padding: 20px 50px 20px 0;
-    text-align: right
-}
-*/
 @media only screen and (max-width: 991px) {
     .main-timeline .date-content {
         margin-top: 35px
@@ -496,5 +451,23 @@ body{
     .main-timeline .title {
         margin-bottom: 10px
     }
+}
+
+#portfolio {
+    padding: 40px;
+    margin: 0 auto;
+
+}
+
+.gallery-title {
+    font-size: 36px;
+    text-align: center;
+    font-weight: 700;
+    padding: 40px 20px 60px;
+}
+
+.filter-button {
+    font-size: 18px;
+    border: 1px solid;
 }
 
