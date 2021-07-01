@@ -9,6 +9,11 @@ body {
     grid-template-columns: 1fr;
 }
 
+.container-fluid {
+    padding:10%;
+    padding-bottom:0px;
+}
+
 /* Portfolio styles*/
 .portfolio-wrapper {
     background-color: #dcdcdc;
